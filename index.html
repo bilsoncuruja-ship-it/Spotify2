@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Spotify2 - Angola Hits</title>
+<meta name="theme-color" content="#000">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+body{background:#000;color:#fff;min-height:100vh;overflow-x:hidden}
+.header{position:sticky;top:0;z-index:20;background:linear-gradient(#000,#000000cc);backdrop-filter:blur(10px);padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #111}
+.logo{font-weight:900;font-size:22px;letter-spacing:-1px}
+.logo b{color:#1DB954}
+.searchBox{flex:1;background:#121212;border:1px solid #222;border-radius:24px;padding:10px 14px;display:flex;align-items:center;gap:8px}
+.searchBox input{background:transparent;border:none;color:#fff;outline:none;width:100%;font-size:13px}
+.nav{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;position:sticky;top:58px;background:#000;z-index:19}
+.nav button{white-space:nowrap;background:#1a1a1a;border:1px solid #222;color:#aaa;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:800}
+.nav button.active{background:#fff;color:#000}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px}
+.cardA{background:linear-gradient(135deg,#1a1a1a,#0e0e0e);border:1px solid #1a1a1a;border-radius:16px;overflow:hidden}
+.cardA img{width:100%;aspect-ratio:1;object-fit:cover}
+.cardA .info{padding:10px}
+.cardA b{font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cardA small{color:#888;font-size:10px}
+.list{padding:8px 16px}
+.songRow{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px}
+.songRow:active{background:#111}
+.songRow img{width:48px;height:48px;border-radius:8px;object-fit:cover}
+.songRow .t{flex:1;overflow:hidden}
+.songRow .t b{font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.songRow .t small{color:#888;font-size:11px}
+.playBtn{width:32px;height:32px;background:#1DB954;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900}
+.player{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,#1a1a1a,#000);border-top:1px solid #222;padding:10px 14px;display:flex;align-items:center;gap:12px;z-index:30}
+.player img{width:52px;height:52px;border-radius:10px}
+.progress{flex:1}
+.progress .bar{height:3px;background:#222;border-radius:10px;overflow:hidden;margin-top:6px}
+.progress .bar div{height:100%;background:#1DB954;width:0%}
+.controls{display:flex;gap:14px;align-items:center;margin-top:6px}
+.controls button{background:transparent;border:none;color:#fff;font-size:16px}
+.loginPage{position:fixed;inset:0;background:#000;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.loginCard{background:#121212;border:1px solid #222;border-radius:24px;padding:24px;width:100%;max-width:360px;text-align:center}
+.loginCard h1{font-size:26px;font-weight:900}
+.loginCard h1 b{color:#1DB954}
+.input{width:100%;background:#000;border:1px solid #222;color:#fff;padding:12px;border-radius:12px;margin-top:10px}
+.btn{width:100%;padding:14px;border-radius:24px;border:none;font-weight:900;margin-top:12px}
+.btn-main{background:#1DB954;color:#000}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="loginPage">
+<div class="loginCard">
+<h1><b>Spotify</b>2</h1>
+<p style="color:#888;font-size:12px;margin-top:6px">Angola Hits • Músicas Angolanas Online</p>
+<input id="userName" class="input" placeholder="Teu nome ex: Bilson">
+<input id="userPhone" class="input" placeholder="923... (opcional)">
+<button class="btn btn-main" onclick="enterApp()">🎧 ENTRAR NO SPOTIFY2</button>
+<p style="font-size:9px;color:#555;margin-top:10px">Funciona no iPhone e Android • 100% HTML</p>
+</div>
+</div>
+
+<div class="header">
+<div class="logo">Spotify<b>2</b></div>
+<div class="searchBox"><span>🔍</span><input id="search" placeholder="Buscar artista, kuduro, afro house..." oninput="searchSongs()"></div>
+<div style="font-size:10px;color:#888" id="userShow"></div>
+</div>
+
+<div class="nav">
+<button class="active" onclick="filterCat('all',this)">Tudo</button>
+<button onclick="filterCat('kuduro',this)">Kuduro</button>
+<button onclick="filterCat('afro house',this)">Afro House</button>
+<button onclick="filterCat('kizomba',this)">Kizomba</button>
+<button onclick="filterCat('semba',this)">Semba</button>
+<button onclick="filterCat('rap',this)">Rap AO</button>
+<button onclick="filterCat('gospel',this)">Gospel</button>
+</div>
+
+<div class="grid" id="artistGrid"></div>
+<div class="list" id="songList"></div>
+
+<div class="player hidden" id="player">
+<img id="pImg" src="">
+<div class="progress" style="flex:1">
+<div style="display:flex;justify-content:space-between"><b id="pTitle" style="font-size:12px"></b><small id="pTime" style="color:#888;font-size:10px">0:00</small></div>
+<small id="pArtist" style="color:#888;font-size:11px"></small>
+<div class="bar"><div id="pBar"></div></div>
+<div class="controls">
+<button onclick="prev()">⏮</button>
+<button onclick="togglePlay()" id="playPause" style="background:#fff;color:#000;width:32px;height:32px;border-radius:50%">⏸</button>
+<button onclick="next()">⏭</button>
+<button onclick="toggleFav()" id="favBtn" style="margin-left:auto">♡</button>
+</div>
+</div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+const SONGS=[
+{id:1,title:"Diz Só",artist:"Gerilson Insrael",cat:"kizomba",img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"},
+{id:2,title:"Kuduro Rápido",artist:"Nagrelha & Bruno M",cat:"kuduro",img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"},
+{id:3,title:"Afro Vibes Luanda",artist:"C4 Pedro",cat:"afro house",img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"},
+{id:4,title:"Semba da Terra",artist:"Yola Semedo",cat:"semba",img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"},
+{id:5,title:"Mama Angola",artist:"Matias Damásio",cat:"kizomba",img:"https://images.unsplash.com/photo-1471478331149-c72f17e33c73?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3"},
+{id:6,title:"Rap da Banda",artist:"Prodígio",cat:"rap",img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"},
+{id:7,title:"Deus Proverá",artist:"Bambila",cat:"gospel",img:"https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3"},
+{id:8,title:"Kuduro 2026",artist:"Scro Que Cuia",cat:"kuduro",img:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"},
+{id:9,title:"Afro House Luanda",artist:"DJ Habias",cat:"afro house",img:"https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3"},
+{id:10,title:"Kizomba Love",artist:"Yola Araújo",cat:"kizomba",img:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300",url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"},
+];
+
+let current=0, playing=false, favorites=JSON.parse(localStorage.getItem('sp2_fav')||'[]');
+const audio=document.getElementById('audio');
+
+function enterApp(){
+ const name=document.getElementById('userName').value.trim();
+ if(!name){alert('Escreve teu nome');return;}
+ localStorage.setItem('sp2_user',name);
+ document.getElementById('loginPage').classList.add('hidden');
+ document.getElementById('userShow').innerText=name.split(' ')[0];
+ init();
+}
+let savedUser=localStorage.getItem('sp2_user');
+if(savedUser){document.getElementById('loginPage').classList.add('hidden'); document.getElementById('userShow').innerText=savedUser.split(' ')[0]; init();}
+
+function init(){ renderArtists(); renderSongs(SONGS); }
+
+function renderArtists(){
+ const uniq=[...new Map(SONGS.map(s=>[s.artist,s])).values()];
+ document.getElementById('artistGrid').innerHTML=uniq.map(s=>`
+ <div class="cardA" onclick="playByArtist('${s.artist}')">
+ <img src="${s.img}">
+ <div class="info"><b>${s.artist}</b><small>${s.cat.toUpperCase()}</small></div>
+ </div>`).join('');
+}
+function renderSongs(list){
+ document.getElementById('songList').innerHTML=list.map((s,i)=>`
+ <div class="songRow" onclick="playIndex(${SONGS.indexOf(s)})">
+ <img src="${s.img}">
+ <div class="t"><b>${s.title}</b><small>${s.artist} • ${s.cat}</small></div>
+ <div class="playBtn">▶</div>
+ </div>`).join('');
+}
+function filterCat(cat,btn){
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+ if(cat=='all') renderSongs(SONGS); else renderSongs(SONGS.filter(s=>s.cat==cat));
+}
+function searchSongs(){
+ const q=document.getElementById('search').value.toLowerCase();
+ renderSongs(SONGS.filter(s=>s.title.toLowerCase().includes(q)||s.artist.toLowerCase().includes(q)||s.cat.includes(q)));
+}
+function playIndex(i){ current=i; loadCurrent(); }
+function playByArtist(artist){ const idx=SONGS.findIndex(s=>s.artist==artist); if(idx>=0) playIndex(idx); }
+function loadCurrent(){
+ const s=SONGS[current];
+ document.getElementById('pImg').src=s.img;
+ document.getElementById('pTitle').innerText=s.title;
+ document.getElementById('pArtist').innerText=s.artist;
+ document.getElementById('player').classList.remove('hidden');
+ document.getElementById('favBtn').innerText=favorites.includes(s.id)?'♥':'♡';
+ audio.src=s.url; audio.play(); playing=true; document.getElementById('playPause').innerText='⏸';
+}
+function togglePlay(){ if(playing){audio.pause(); playing=false; document.getElementById('playPause').innerText='▶'} else{audio.play(); playing=true; document.getElementById('playPause').innerText='⏸'} }
+function next(){ current=(current+1)%SONGS.length; loadCurrent(); }
+function prev(){ current=(current-1+SONGS.length)%SONGS.length; loadCurrent(); }
+function toggleFav(){
+ const id=SONGS[current].id;
+ if(favorites.includes(id)){favorites=favorites.filter(f=>f!=id)} else favorites.push(id);
+ localStorage.setItem('sp2_fav',JSON.stringify(favorites)); document.getElementById('favBtn').innerText=favorites.includes(id)?'♥':'♡';
+}
+audio.ontimeupdate=()=>{
+ const p=(audio.currentTime/audio.duration)*100||0;
+ document.getElementById('pBar').style.width=p+'%';
+ document.getElementById('pTime').innerText=Math.floor(audio.currentTime/60)+':'+('0'+Math.floor(audio.currentTime%60)).slice(-2);
+}
+audio.onended=()=>next();
+
+// Instrução para colocar tuas músicas:
+// Substitui url: "https://..." por link direto MP3 ou arquivo local ex: "musicas/gerilson.mp3"
+</script>
+</body>
+</html>
